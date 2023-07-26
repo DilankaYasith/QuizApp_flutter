@@ -1,10 +1,14 @@
 import 'package:adv_basics/data/questions.dart';
+import 'package:adv_basics/questions_summary.dart';
 import 'package:flutter/material.dart';
 
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key, required this.chosenAnswers});
+  const ResultScreen(
+      {super.key, required this.chosenAnswers, required this.onRestart});
 
   final List<String> chosenAnswers;
+
+  final void Function() onRestart;
 
   List<Map<String, Object>> getSummaryData() {
     final List<Map<String, Object>> summary = [];
@@ -22,18 +26,45 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final summaryData = getSummaryData();
+    final numTotalQuestions = questions.length;
+    final numCorrectQuestions = summaryData
+        .where((data) => data['user_answer'] == data['correct_answer'])
+        .length;
+
     return SizedBox(
       width: double.infinity,
       child: Container(
         margin: const EdgeInsets.all(40),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text("Answered questions"),
+          Text(
+            'You answered $numCorrectQuestions out of $numTotalQuestions questions correctly!',
+            style: const TextStyle(
+              color: Color.fromARGB(255, 247, 201, 255),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(
             height: 30,
           ),
-          TextButton(
-            onPressed: () {},
-            child: const Text("Restart quiz"),
+          QuestionsSummary(summaryData),
+          const SizedBox(
+            height: 30,
+          ),
+          TextButton.icon(
+            onPressed: onRestart,
+            icon: const Icon(Icons.refresh),
+            style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color.fromARGB(255, 76, 38, 143),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+            label: const Text(
+              "Restart quiz",
+              style: TextStyle(fontSize: 16),
+            ),
           )
         ]),
       ),
